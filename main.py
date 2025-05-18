@@ -77,20 +77,22 @@ class DockerApp:
         
         ttk.Button(button_frame, text="Stop and Remove Container", command=self.stop_and_remove_container).grid(row=2, column=0, columnspan=2, pady=5, sticky="ew")
 
-        # Make columns expandable
         for i in range(3):
             main_frame.columnconfigure(i, weight=1)
 
+    # Установка volume
     def browse_volume(self):
         path = filedialog.askdirectory()
         if path:
             self.volume_host.set(path)
 
+    # Установка начального скрипта
     def browse_script_file(self):
         path = filedialog.askopenfilename(filetypes=[("Text Files", "*.sh"), ("All Files", "*.*")])
         if path:
             self.script_file.set(path)
 
+    # Генерация Докерфайла
     def create_dockerfile(self):
         java_version = self.java_version.get()
         uid = os.getuid()
@@ -135,9 +137,8 @@ ENV PATH="$JAVA_HOME/bin:$PATH"
 RUN ln -s /opt/instantclient/sqlplus /usr/bin/sqlplus64
 """
 
-        # Добавим ENTRYPOINT только если флаг активен
+        # Добавление скрипта, только если флаг активен
         if self.use_script.get():
-            print("AAA")
             dockerfile_content += """
 COPY script.sh /script.sh
 RUN chmod +x /script.sh
@@ -150,7 +151,7 @@ ENTRYPOINT ["/opt/sqldeveloper/sqldeveloper.sh"]
         with open("Dockerfile", "w") as f:
             f.write(dockerfile_content)
         
-        # Also, create the script file in the Docker build context
+        # Если начального скрипта нет
         if script_content:
             with open("script.sh", "w") as script_file:
                 script_file.write(script_content)
@@ -228,10 +229,9 @@ ENTRYPOINT ["/opt/sqldeveloper/sqldeveloper.sh"]
         except subprocess.CalledProcessError:
             messagebox.showerror("Error", "Failed to run Docker container.")
 
-
+    # Остановка и удаление контейнера
     def stop_and_remove_container(self):
         try:
-            # Stop and remove the container if it exists
             subprocess.run("sudo docker stop sqldeveloper-container", shell=True, check=True)
             subprocess.run("sudo docker rm sqldeveloper-container", shell=True, check=True)
             messagebox.showinfo("Success", "Container stopped and removed successfully!")
