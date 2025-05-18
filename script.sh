@@ -12,10 +12,6 @@ DB_PORT="1521"
 DB_USER="SYSTEM"
 DB_PASS="password"
 
-# Используем SQL*Plus для подключения и выполнения SQL-запросов
-sqlplus64 -S "$DB_USER/$DB_PASS@$DB_HOST:$DB_PORT/$ORACLE_SID" <<EOF
--- Пример запроса для проверки подключения
-SELECT 'Database connection successful!' FROM dual;
 EXIT;
 EOF
 

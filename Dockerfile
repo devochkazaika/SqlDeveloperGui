@@ -31,6 +31,5 @@ ENV PATH="$JAVA_HOME/bin:$PATH"
 
 RUN ln -s /opt/instantclient/sqlplus /usr/bin/sqlplus64
 
-COPY script.sh /script.sh
-RUN chmod +x /script.sh
-ENTRYPOINT ["/bin/bash", "-c", "/script.sh && /opt/sqldeveloper/sqldeveloper.sh"]
+ENTRYPOINT ["/opt/sqldeveloper/sqldeveloper.sh"]
+        
