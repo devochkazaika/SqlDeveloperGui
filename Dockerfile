@@ -1,7 +1,7 @@
 
 FROM debian:bookworm-slim
 
-ARG uid=1000
+ARG uid=0
 
 RUN test -n "${uid}" || (echo "docker build-arg uid must be set" && false)
 
@@ -19,7 +19,7 @@ RUN apt-get update && \
     rpm2cpio \
     cpio \
     && rm -rf /var/lib/apt/lists/*
-
+    
 RUN wget --no-check-certificate --quiet \
     "https://download.oracle.com/otn_software/java/sqldeveloper/sqldeveloper-24.3.1-347.1826.noarch.rpm" -O /tmp/sqldeveloper.rpm
 
@@ -29,4 +29,8 @@ RUN rpm2cpio /tmp/sqldeveloper.rpm | cpio -idmv && \
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 ENV PATH="$JAVA_HOME/bin:$PATH"
 
-CMD ["/usr/sqldeveloper/opt/sqldeveloper/sqldeveloper.sh"]
+RUN ln -s /opt/instantclient/sqlplus /usr/bin/sqlplus64
+
+COPY script.sh /script.sh
+RUN chmod +x /script.sh
+ENTRYPOINT ["/bin/bash", "-c", "/script.sh && /opt/sqldeveloper/sqldeveloper.sh"]
